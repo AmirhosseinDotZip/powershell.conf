@@ -1,4 +1,3 @@
-Set-Item -Path Env:OPENAI_API_KEY -Value "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"
 Set-Alias v nvim
 Set-Alias ll ls
 Set-Alias grep findstr
