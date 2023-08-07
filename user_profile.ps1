@@ -11,6 +11,35 @@ Set-Alias cpy "C:\Program Files\Git\usr\bin\cp.exe"
 Set-Alias cmatrix "C:\Users\baniminator\.config\powershell\cmatrix.ps1"
 Set-Alias pray "C:\Users\baniminator\.config\powershell\pr.ps1"
 
+
+
+Function setprox {
+    Param (
+        [Parameter(Position=0, Mandatory=$true)]
+        [string]$ProxyServer,
+
+        [Parameter(Position=1, Mandatory=$true)]
+        [int]$ProxyPort
+    )
+
+    $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+    $proxyValue = $ProxyServer + ":" + $ProxyPort
+    Set-ItemProperty -Path $regPath -Name ProxyServer -Value $proxyValue
+    Set-ItemProperty -Path $regPath -Name ProxyEnable -Value 1
+    Write-Output "Proxy server enabled successfully!"}
+
+Function prox {
+    $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+    Set-ItemProperty -Path $regPath -Name ProxyEnable -Value 1
+    Write-Output "Proxy server enabled successfully!"
+}
+
+Function noprox {
+    $regPath = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Internet Settings"
+    Set-ItemProperty -Path $regPath -Name ProxyEnable -Value 0
+    Write-Output "Proxy server disabled successfully!"
+}
+
 function getName {wmic "csproduct get name"}
 function schrome {chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security}
 function cc { & "C:\Program Files\Mozilla Firefox\firefox.exe" -private-window 'https://chatbot.theb.ai';exit }
@@ -19,6 +48,7 @@ function fcs2 { curl "https://v2.wttr.in/tonekabon" }
 function des { Set-Location "C:\Users\baniminator\Desktop\" }
 function which($command) { Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue }
 function psconf { nvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" }
+function psfold { Set-Location "C:\Users\baniminator\.config\powershell" }
 function nvconf { nvim "C:\Users\baniminator\AppData\Local\nvim\init.lua" }
 function nvfold { Set-Location C:\Users\baniminator\AppData\Local\nvim }
 function hist { nvim "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
