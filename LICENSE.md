@@ -1,5 +1,6 @@
 # BANIMINATOR License
 
+---
 By using the **BANIMINATOR License**, herein referred to as the "License," you are granted certain rights and responsibilities to utilize the software and associated materials, all collectively referred to as the "BANIMINATOR."
 
 ## Preamble
