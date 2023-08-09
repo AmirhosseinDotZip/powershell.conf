@@ -1,57 +1,57 @@
-# powershell.conf 
+📁 README
 
-This repository contains my PowerShell profile terminal configuration. It includes various aliases and functions that enhance the PowerShell experience. 
+# 🌟 Powershell Config 🌟
 
-## Aliases
+This repository contains my personal Powershell configuration. It is designed to enhance your Powershell experience and make it more efficient and enjoyable.
 
-- `v`: Sets the alias for `nvim`
-- `ll`: Sets the alias for `ls`
-- `grep`: Sets the alias for `findstr`
-- `tig`: Sets the alias for `"C:\Program Files\Git\usr\bin\tig.exe"`
-- `less`: Sets the alias for `"C:\Program Files\Git\usr\bin\less.exe"`
-- `mkdir`: Sets the alias for `"C:\Program Files\Git\usr\bin\mkdir.exe"`
-- `touch`: Sets the alias for `"C:\Program Files\Git\usr\bin\touch.exe"`
-- `mv`: Sets the alias for `"C:\Program Files\Git\usr\bin\mv.exe"`
-- `tail`: Sets the alias for `"C:\Program Files\Git\usr\bin\tail.exe"`
-- `cpy`: Sets the alias for `"C:\Program Files\Git\usr\bin\cp.exe"`
-- `cmatrix`: Sets the alias for `"C:\Users\baniminator\.config\powershell\cmatrix.ps1"`
-- `pray`: Sets the alias for `"C:\Users\baniminator\.config\powershell\pr.ps1"`
+### 🔧 How to Use
+1. Clone the repository:
+   ```
+   git clone https://github.com/amirhossein-ix/powershell.conf
+   ```
 
-## Functions
+2. Navigate where your config is placed by running this in your terminal:
+   ```
+   $PROFILE
+   ```
 
-- `setprox`: This function enables the proxy server by setting the specified proxy server and port in the Windows registry.
-- `prox`: This function enables the proxy server.
-- `noprox`: This function disables the proxy server.
-- `getName`: This function displays the name of the computer's product.
-- `schrome`: This function opens Chrome in a development session with web security disabled.
-- `cc`: This function opens Mozilla Firefox in a private window with the chatbot website.
-- `fcs`: This function displays the weather for Tonekabon using curl and 'wttr.in'.
-- `fcs2`: This function displays the weather for Tonekabon using curl and 'v2.wttr.in'.
-- `des`: This function changes the current location to the desktop folder.
-- `which`: This function displays the path of the specified command.
-- `psconf`: This function opens the PowerShell user profile script in nvim for editing.
-- `psfold`: This function changes the current location to the PowerShell config folder.
-- `nvconf`: This function opens the nvim init.lua file in nvim for editing.
-- `nvfold`: This function changes the current location to the nvim config folder.
-- `hist`: This function opens the PowerShell console host history file in nvim for editing.
-- `yymp3`: This function downloads the audio from a YouTube video as an mp3 file.
-- `yy`: This function downloads a YouTube video in the best available quality.
-- `sourceerror`: This function changes the current location to the sourceerror folder.
-- `fuck`: This function outputs the message "Fuck Yeah".
-- `ex`: This function opens the current folder in File Explorer.
-- `rc`: This function opens the Recycle Bin folder.
-- `m`: This function plays music in mpv with no video and shuffle mode.
-- `mplay`: This function plays music in mpv with no video.
-- `mm`: This function plays music in mpv with no video, shuffle mode, and the specified path.
-- `cdm`: This function changes the current location to the Music folder.
+3. Put my config there, Customize the configuration to suit your needs. Update aliases, functions, and prompts based on your preferences and requirements.
 
-## Customizations
 
-- The `prompt` function has been modified to display the current folder, user, date, admin status, and last command information.
+4. Reload your Powershell session.
 
-## Additional Functions
+5. Enjoy!
+   ```
+   🚀🚀🚀 
+   ```
 
-- `transfer`: This function allows you to upload a file to transfer.sh and get a download link.
-- `pinfo`: This function provides detailed information about a specific process.
+### ✨ Features
+- Customized aliases to simplify frequently used commands.
+- Optimized functions for common tasks, making your workflow more efficient.
+- Personalized prompts with useful information to enhance productivity.
+- Improved tab completion for commands and filenames.
+- Syntax highlighting and colorization for better code readability.
+- Integration with Git for seamless version control management.
+- Custom keybindings and shortcuts for rapid execution.
 
-Feel free to clone this repository and use the PowerShell profile terminal configuration to enhance your PowerShell experience.
+### 🔒 Security
+Please review the code and configuration files before installation. It is essential to ensure that the script does not contain any malicious code or compromises your system's security.
+
+‼### ️ Disclaimer <br/>
+The Powershell configuration provided is customized for personal use. It may not suit everyone's preferences or requirements. Feel free to modify it according to your needs.
+
+### ❤️ Contributions <br/>
+Contributions, suggestions, and improvements are always welcome! If you have any ideas to enhance this configuration, please feel free to open an issue or submit a pull request.
+
+### 📃 License <br/>
+This Powershell configuration is licensed under the BANIMINATOR license. Please refer to the LICENSE file for more details.
+
+### 📧 Contact <br/>
+If you have any questions or need further assistance, feel free to reach out to me at my[ Email](ambio.work@gmail.com), [Telegram](https://t.me/amirhossein_ix) or [Instagram](https://hid.den)
+
+### 🌐 Website <br/>
+Visit [your website](https://not.yet) for more information and other projects.
+
+---
+####  🌟 Thank you for checking out my Powershell configuration! Happy coding! 🌟
+---
