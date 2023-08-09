@@ -32,4 +32,4 @@ This license is effective until it is terminated. The creators and contributors 
 
 The BANIMINATOR License enables you to unleash your artistic potential and create breathtaking animations. Remember to enjoy the journey, respect the rights of others, and contribute to the development of the BANIMINATOR community. Let your imagination run wild!
 
-**Copyright** © [2023]() [BANIMINAOTR]()NIMINATOR
+**Copyright** © [2023]() [BANIMINAOTR]()
