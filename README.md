@@ -37,7 +37,7 @@ This repository contains my personal Powershell configuration. It is designed to
 ### 🔒 Security
 Please review the code and configuration files before installation. It is essential to ensure that the script does not contain any malicious code or compromises your system's security.
 
-### ️🪧Disclaimer <br/>
+### ️🪧 Disclaimer <br/>
 The Powershell configuration provided is customized for personal use. It may not suit everyone's preferences or requirements. Feel free to modify it according to your needs.
 
 ### ❤️ Contributions <br/>
