@@ -47,10 +47,11 @@ function fcs { curl "https://wttr.in/tonekabon" }
 function fcs2 { curl "https://v2.wttr.in/tonekabon" }
 function des { Set-Location "C:\Users\baniminator\Desktop\" }
 function which($command) { Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue }
-function psconf { nvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" }
+function psconf { astronvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" }
 function psfold { Set-Location "C:\Users\baniminator\.config\powershell" }
 function nvconf { nvim "C:\Users\baniminator\AppData\Local\nvim\init.lua" }
 function nvfold { Set-Location C:\Users\baniminator\AppData\Local\nvim }
+function nxfold { Set-Location D:\sourceerror\Web\frontend\._NEXT\}
 function hist { nvim "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
 # {yt-dlp -x --audio-format mp3 --output '%(playlist_index)s-%(title)s.%(ext)s' $link
 function yymp3 ($link) { yt-dlp -x --audio-format mp3 --output '%(title)s.%(ext)s' $link }
@@ -245,4 +246,56 @@ function portinfo {
   else {
     Write-Host "Port $Port is not in use" -ForegroundColor Green
   }
+}
+
+#_________________________________________________________________________
+#_________________________________________________________________________
+#_________________________________________________________________________
+#_________________________________________________________________________
+#_________________________________________________________________________
+#_________________________________________________________________________
+
+
+function lazynvim()
+{
+  $env:NVIM_APPNAME="lazynvim"
+  nvim $args
+}
+function nvchad()
+{
+  $env:NVIM_APPNAME="NvChad"
+  nvim $args
+}
+function astronvim()
+{
+  $env:NVIM_APPNAME="AstroNvim"
+  nvim $args
+}
+
+function nvims()
+{
+  $items = "default", "LazyNvim", "AstroNvim", "NvChad", "EmptyNvim", "lazynvim"
+  $config = $items | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0
+
+  if ([string]::IsNullOrEmpty($config))
+  {
+    Write-Output "Nothing selected"
+    break
+  }
+ 
+  if ($config -eq "default")
+  {
+    $config = ""
+  }
+
+  $env:NVIM_APPNAME=$config
+  nvim $args
+}
+
+
+function Get-FuzzyFile {
+    $selectedFile = Get-ChildItem -File | ForEach-Object { $_.FullName } | fzf --preview "cat {}"
+    if ($selectedFile) {
+        astronvim $selectedFile   # Replace 'code' with your preferred editor command
+    }
 }
