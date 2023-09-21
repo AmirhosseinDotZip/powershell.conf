@@ -1,4 +1,4 @@
-Set-Alias v nvim
+# Set-Alias v nvim
 Set-Alias ll ls
 Set-Alias grep findstr
 Set-Alias tig "C:\Program Files\Git\usr\bin\tig.exe"
@@ -8,9 +8,31 @@ Set-Alias touch "C:\Program Files\Git\usr\bin\touch.exe"
 Set-Alias mv "C:\Program Files\Git\usr\bin\mv.exe"
 Set-Alias tail "C:\Program Files\Git\usr\bin\tail.exe"
 Set-Alias cpy "C:\Program Files\Git\usr\bin\cp.exe"
+Set-Alias bat "C:\Program Files\Git\usr\bin\bat.exe"
 Set-Alias cmatrix "C:\Users\baniminator\.config\powershell\cmatrix.ps1"
 Set-Alias pray "C:\Users\baniminator\.config\powershell\pr.ps1"
 
+${function:~} = { Set-Location ~ }
+ 
+# Directory Listing: Use `ls.exe` if available
+if (Get-Command ls.exe -ErrorAction SilentlyContinue | Test-Path)
+{
+    rm alias:ls -ErrorAction SilentlyContinue
+# Set `ls` to call `ls.exe` and always use --color
+        ${function:ls} = { ls.exe --color @args }
+# List all files in long format
+    ${function:l} = { ls -lF @args }
+# List all files in long format, including hidden files
+    ${function:la} = { ls -laF @args }
+# List only directories
+    ${function:ld} = { Get-ChildItem -Directory -Force @args }
+} else
+{
+# List all files, including hidden files
+    ${function:la} = { ls -Force @args }
+# List only directories
+    ${function:ld} = { Get-ChildItem -Directory -Force @args }
+}
 
 
 Function setprox {
@@ -52,7 +74,7 @@ function psfold { Set-Location "C:\Users\baniminator\.config\powershell" }
 function nvconf { nvim "C:\Users\baniminator\AppData\Local\nvim\init.lua" }
 function nvfold { Set-Location C:\Users\baniminator\AppData\Local\nvim }
 function nxfold { Set-Location D:\sourceerror\Web\frontend\._NEXT\}
-function hist { nvim "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
+function hist { v "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
 # {yt-dlp -x --audio-format mp3 --output '%(playlist_index)s-%(title)s.%(ext)s' $link
 function yymp3 ($link) { yt-dlp -x --audio-format mp3 --output '%(title)s.%(ext)s' $link }
 function yy ($url) { yt-dlp -f "best[height<=720]" $url }
@@ -64,6 +86,7 @@ Function m { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-play
 Function mplay { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback $args }
 Function mm { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback --shuffle "D:\Music" }
 function cdm { Set-Location D:\Music }
+function d {Set-Location "D:\"}
 
 
 function prompt {
@@ -103,6 +126,12 @@ function prompt {
     Write-Host "⌚️$elapsedTime " -ForegroundColor White -BackgroundColor DarkGray 
     return "🚀🚀🚀 "
 } 
+
+
+
+
+
+
 
 
 function transfer {
@@ -271,7 +300,11 @@ function astronvim()
   $env:NVIM_APPNAME="AstroNvim"
   nvim $args
 }
-
+function v()
+{
+  $env:NVIM_APPNAME="AstroNvim"
+  nvim $args
+}
 function nvims()
 {
   $items = "default", "LazyNvim", "AstroNvim", "NvChad", "EmptyNvim", "lazynvim"
@@ -293,9 +326,77 @@ function nvims()
 }
 
 
-function Get-FuzzyFile {
-    $selectedFile = Get-ChildItem -File | ForEach-Object { $_.FullName } | fzf --preview "cat {}"
-    if ($selectedFile) {
-        astronvim $selectedFile   # Replace 'code' with your preferred editor command
+
+function findkill {
+    $selectedProcess = Get-Process | ForEach-Object { "$($_.Id): $($_.ProcessName)" } | fzf | ForEach-Object { $_.Split(':')[0] }
+    if ($selectedProcess) {
+        Stop-Process -Id $selectedProcess
     }
 }
+function fdir{
+    param (
+        [string]$Path = $PWD.Path
+    )
+
+    $selectedPath = Get-ChildItem -LiteralPath $Path -Directory -Recurse | Select-Object -ExpandProperty FullName | fzf
+
+    if ($selectedPath) {
+        Set-Location -LiteralPath $selectedPath
+    }
+}
+
+function ffile {
+    param (
+        [string]$Path = $PWD.Path,
+        [string]$Editor = "astronvim"
+    )
+
+    $selectedFile = Get-ChildItem -LiteralPath $Path -File -Recurse | Select-Object -ExpandProperty FullName | fzf
+
+    if ($selectedFile) {
+        & $Editor $selectedFile
+    }
+}
+
+
+function cfile {
+    param (
+        [string]$Path = $PWD.Path
+    )
+
+    $selectedFile = Get-ChildItem -LiteralPath $Path -File -Recurse | Select-Object -ExpandProperty FullName | fzf
+
+    if ($selectedFile) {
+        $editorList = @( "astronvim", "code", "vim", "nvim", "notepad", "qview", "mpv", "firefox", "chrome")
+        $selectedEditor = $editorList | fzf
+
+        if ($selectedEditor) {
+            & $selectedEditor $selectedFile
+        }
+    }
+}
+
+
+function ws {
+    param(
+        [string]$foldername
+    )
+    $webstormPath = "C:\Program Files\JetBrains\WebStorm 2022.2\bin\webstorm64.exe"
+    $arguments = $foldername
+    if (Test-Path $webstormPath) {
+        Start-Process $webstormPath -ArgumentList $arguments -WindowStyle Hidden
+    } else {
+        Write-Host "WebStorm not found at path: $webstormPath"
+    }
+}
+
+
+
+# mpv videoName -sub-file sub1 -sub-file sub2 -secondary-sid 2
+
+
+
+
+
+# Invoke-Expression (&starship init powershell)
+Invoke-Expression (& { (zoxide init powershell | Out-String) })
