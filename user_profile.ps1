@@ -128,12 +128,6 @@ function prompt {
 } 
 
 
-
-
-
-
-
-
 function transfer {
     param (
         [Parameter(Mandatory = $true, Position = 0)]
@@ -305,9 +299,14 @@ function v()
   $env:NVIM_APPNAME="AstroNvim"
   nvim $args
 }
+function jnvim()
+{
+  $env:NVIM_APPNAME="jnvim"
+  nvim $args
+}
 function nvims()
 {
-  $items = "default", "LazyNvim", "AstroNvim", "NvChad", "EmptyNvim", "lazynvim"
+  $items = "default", "LazyNvim", "AstroNvim", "NvChad", "EmptyNvim", "lazynvim", "jnvim"
   $config = $items | fzf --prompt=" Neovim Config  " --height=~50% --layout=reverse --border --exit-0
 
   if ([string]::IsNullOrEmpty($config))
