@@ -13,6 +13,13 @@ Set-Alias cmatrix "C:\Users\baniminator\.config\powershell\cmatrix.ps1"
 Set-Alias pray "C:\Users\baniminator\.config\powershell\pr.ps1"
 
 ${function:~} = { Set-Location ~ }
+
+${function:v2} = {
+    Set-Location "C:\Users\baniminator\Desktop";
+    # wget https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt
+    wget https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt
+}
+
  
 # Directory Listing: Use `ls.exe` if available
 if (Get-Command ls.exe -ErrorAction SilentlyContinue | Test-Path)
@@ -389,13 +396,36 @@ function ws {
     }
 }
 
+function bt {
+    param(
+        [int]$IntervalMinutes = 20
+    )
+
+    while ($true) {
+        # Insert the code to generate the ringing sound here
+        # For example, you can use the [console]::beep() method
+
+        [console]::beep(500, 1000)  # Example: Generate a beep sound
+
+        Write-Host "Ringing!"
+
+        # Wait for the specified interval in minutes
+        Start-Sleep -Seconds ($IntervalMinutes * 60)
+    }
+}
 
 
 # mpv videoName -sub-file sub1 -sub-file sub2 -secondary-sid 2
 
-
-
-
+function ff {
+    param(
+        [string]$searchTerm
+    )
+    $firefoxPath = "C:\Program Files\Mozilla Firefox\firefox.exe"  # Update the path to your Firefox installation if needed
+    $searchUrl = "https://www.google.com/search?q=$searchTerm"  # Update with your preferred search engine URL
+    
+    & $firefoxPath $searchUrl
+}
 
 # Invoke-Expression (&starship init powershell)
 Invoke-Expression (& { (zoxide init powershell | Out-String) })
