@@ -1,6 +1,9 @@
+# . "C:\Users\baniminator\.config\powershell\mpv-powershell-completion.ps1"
 # Set-Alias v nvim
 Set-Alias ll ls
-Set-Alias grep findstr
+# Set-Alias grep findstr
+Set-Alias grep "C:\Program Files\Git\usr\bin\grep.exe"
+Set-Alias awk "C:\Program Files\Git\usr\bin\awk.exe"
 Set-Alias tig "C:\Program Files\Git\usr\bin\tig.exe"
 Set-Alias less "C:\Program Files\Git\usr\bin\less.exe"
 Set-Alias mkdir "C:\Program Files\Git\usr\bin\mkdir.exe"
@@ -11,9 +14,16 @@ Set-Alias cpy "C:\Program Files\Git\usr\bin\cp.exe"
 Set-Alias bat "C:\Program Files\Git\usr\bin\bat.exe"
 Set-Alias cmatrix "C:\Users\baniminator\.config\powershell\cmatrix.ps1"
 Set-Alias pray "C:\Users\baniminator\.config\powershell\pr.ps1"
+Set-Alias fkill Invoke-FuzzyKillProcess
+Set-Alias fd Invoke-FuzzySetLocation
+Set-Alias fscoop Invoke-FuzzyScoop
+Import-Module PSFzf
+import-Module Terminal-Icons
 
+# Set-Alias -Name cd -Value z -Option AllScope
+
+# copy /b pic.jpg+tel.zip pix.jpg
 ${function:~} = { Set-Location ~ }
-
 ${function:v2} = {
     Set-Location "C:\Users\baniminator\Desktop";
     # wget https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt
@@ -69,6 +79,29 @@ Function noprox {
     Write-Output "Proxy server disabled successfully!"
 }
 
+function mmm{
+    Set-Location D:\Music
+    $query =  fzf --prompt=" 🎧 Search for Infinity    " --height=70% --layout=reverse --border --exit-0
+    mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback --shuffle $query
+    mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback --shuffle "D:\Music"
+}
+function vvv{
+    $drives ="D:\", "C:\"
+    $getDrive = $drives | fzf --prompt="select drive to search... " --height=20% --layout=reverse --border --exit-0
+    Set-Location $getDrive
+    $query =  fzf --prompt=" 🎧 Search for Infinity    " --height=70% --layout=reverse --border --exit-0
+    mpv $query &
+}
+function spc {
+  $allCommands = Get-Command
+  $query = $allCommands | fzf --prompt="select drive to search... " --height=90% --layout=reverse --border --exit-0
+}
+
+Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
+
+function p8 {ping 8.8.8.8 -t}
+function b {param($a) & "C:\Users\baniminator\scoop\apps\bat\0.24.0\bat.exe" $a}
+function whenexpire {slmgr /xpr}
 function getName {wmic "csproduct get name"}
 function schrome {chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security}
 function cc { & "C:\Program Files\Mozilla Firefox\firefox.exe" -private-window 'https://chatbot.theb.ai';exit }
@@ -76,7 +109,8 @@ function fcs { curl "https://wttr.in/tonekabon" }
 function fcs2 { curl "https://v2.wttr.in/tonekabon" }
 function des { Set-Location "C:\Users\baniminator\Desktop\" }
 function which($command) { Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue }
-function psconf { astronvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" }
+function psconf { Set-Location C:\Users\baniminator\.config\powershell;
+                  astronvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" }
 function psfold { Set-Location "C:\Users\baniminator\.config\powershell" }
 function nvconf { nvim "C:\Users\baniminator\AppData\Local\nvim\init.lua" }
 function nvfold { Set-Location C:\Users\baniminator\AppData\Local\nvim }
@@ -84,16 +118,29 @@ function nxfold { Set-Location D:\sourceerror\Web\frontend\._NEXT\}
 function hist { v "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
 # {yt-dlp -x --audio-format mp3 --output '%(playlist_index)s-%(title)s.%(ext)s' $link
 function yymp3 ($link) { yt-dlp -x --audio-format mp3 --output '%(title)s.%(ext)s' $link }
+
+function ytplaylist ($link, $quality = 1080) {
+    $format = "(bestvideo[height<=$quality]+bestaudio/best[height<=$quality])"
+    yt-dlp -f $format -o "%(playlist_index)s - %(title)s.%(ext)s" $link
+}
+function Search-YouTube ($keyword) {
+  $searchUrl = "https://www.youtube.com/results?search_query=$keyword"
+  $results = Invoke-WebRequest -Uri $searchUrl | Select-String -Pattern "video-title" | ForEach-Object { $_.Line }
+  $results
+}
+
 function yy ($url) { yt-dlp -f "best[height<=720]" $url }
 function sourceerror { Set-Location "D:\sourceerror" }
 function fuck { Write-Output "Fuck Yeah"; }
 Function ex { explorer.exe . }
 Function rc { Start-Process shell:RecycleBinFolder; exit; }
+function sysinfo {powershell gwmi win32_bios}
 Function m { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback --shuffle $args }
 Function mplay { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback $args }
 Function mm { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-playback --shuffle "D:\Music" }
-function cdm { Set-Location D:\Music }
+function cm { Set-Location D:\Music }
 function d {Set-Location "D:\"}
+function installer {irm "https://christitus.com/win" | iex}
 
 
 function prompt {
@@ -373,7 +420,7 @@ function cfile {
     $selectedFile = Get-ChildItem -LiteralPath $Path -File -Recurse | Select-Object -ExpandProperty FullName | fzf
 
     if ($selectedFile) {
-        $editorList = @( "astronvim", "code", "vim", "nvim", "notepad", "qview", "mpv", "firefox", "chrome")
+        $editorList = @( "astronvim", "code", "vim", "nvim", "notepad", "qview", "mpv", "firefox", "chrome", "jq")
         $selectedEditor = $editorList | fzf
 
         if ($selectedEditor) {
@@ -413,6 +460,8 @@ function bt {
         Start-Sleep -Seconds ($IntervalMinutes * 60)
     }
 }
+
+
 
 
 # mpv videoName -sub-file sub1 -sub-file sub2 -secondary-sid 2
