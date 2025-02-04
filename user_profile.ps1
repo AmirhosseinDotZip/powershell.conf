@@ -1,8 +1,8 @@
-# . "C:\Users\baniminator\.config\powershell\mpv-powershell-completion.ps1"
+# . "C:\Users\amirhosseindotzip\.config\powershell\mpv-powershell-completion.ps1"
 # Set-Alias v nvim
 Set-Alias ll ls
 # Set-Alias grep findstr
-Set-Alias c "C:\Users\baniminator\AppData\Local\Programs\Microsoft VS Code\Code.exe"
+Set-Alias c "C:\Users\amirhosseindotzip\AppData\Local\Programs\Microsoft VS Code\Code.exe"
 Set-Alias grep "C:\Program Files\Git\usr\bin\grep.exe"
 Set-Alias awk "C:\Program Files\Git\usr\bin\awk.exe"
 Set-Alias tig "C:\Program Files\Git\usr\bin\tig.exe"
@@ -14,27 +14,184 @@ Set-Alias mv "C:\Program Files\Git\usr\bin\mv.exe"
 Set-Alias tail "C:\Program Files\Git\usr\bin\tail.exe"
 Set-Alias cpy "C:\Program Files\Git\usr\bin\cp.exe"
 Set-Alias bat "C:\Program Files\Git\usr\bin\bat.exe"
-Set-Alias cmatrix "C:\Users\baniminator\.config\powershell\cmatrix.ps1"
-Set-Alias pray "C:\Users\baniminator\.config\powershell\pr.ps1"
+Set-Alias cmatrix "C:\Users\amirhosseindotzip\.config\powershell\cmatrix.ps1"
+Set-Alias pray "C:\Users\amirhosseindotzip\.config\powershell\pr.ps1"
 Set-Alias fkill Invoke-FuzzyKillProcess
 Set-Alias fcd Invoke-FuzzySetLocation
 Set-Alias fscoop Invoke-FuzzyScoop
-Import-Module PSFzf
-import-Module Terminal-Icons
-Set-Alias digitalClock "C:\Users\baniminator\.config\powershell\clock.ps1"
-Set-Alias ytdlp "C:\Users\baniminator\.config\powershell\ytdlp.ps1"
+Set-Alias digitalClock "C:\Users\amirhosseindotzip\.config\powershell\clock.ps1"
+Set-Alias ytdlp "C:\Users\amirhosseindotzip\.config\powershell\ytdlp.ps1"
+
+
 
 # Set-Alias -Name cd -Value z -Option AllScope
 
+# The Main Prompt
+function prompt {
+    # Environment Setup
+    # $host.ui.RawUI.WindowTitle = "$pwd"
+    $CmdPromptCurrentFolder = Split-Path -Path $pwd -Leaf
+    $CmdPromptUser = [Security.Principal.WindowsIdentity]::GetCurrent();
+    # $Date = Get-Date -Format 'dddd hh:mm:ss tt'
+    $IsAdmin = (New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+
+    # Color Theme
+    $colors = @{
+        AdminBg     = "DarkRed"
+        AdminFg     = "White"
+        UserBg      = "DarkBlue"
+        UserFg      = "White"
+        PathBg      = "DarkGray"
+        PathFg      = "White"
+        GitBg       = "Blue"           # Changed from DarkMagenta to Blue
+        GitFg       = "White"
+        TimeBg      = "DarkCyan"
+        TimeFg      = "White"
+        BatteryBg   = "Green"      # Changed from DarkYellow to Green
+        BatteryFg   = "Black"      # Changed to Black for better contrast on Green
+        PythonBg    = "DarkGreen"
+        PythonFg    = "White"
+        ExecutionBg = "DarkGray"
+        ExecutionFg = "White"
+    }
+
+    # function Get-BatteryStatus {
+    #     $battery = Get-CimInstance Win32_Battery
+    #     if ($battery) {
+    #         $percentage = $battery.EstimatedChargeRemaining
+    #         $status = if ($battery.BatteryStatus -eq 2) { "⚡" } else { "🔋" }
+    #         return "$status$percentage%"
+    #     }
+    #     return $null
+    # }
+
+    # Git Status Function with Extended Information
+         function Get-GitStatus {
+         if (-not (Get-Command git -ErrorAction SilentlyContinue)) {
+             return $null
+         }
+
+         # Check if current directory is inside a git repository
+         if (-not (git rev-parse --is-inside-work-tree -ErrorAction SilentlyContinue)) {
+             return $null
+         }
+
+         # Proceed with existing git status retrieval
+         try {
+             $branch = git rev-parse --abbrev-ref HEAD 2>$null
+             if ($branch) {
+                 $status = git status --porcelain
+                 $ahead = git status -sb 2>$null | Select-String "\[ahead (\d+)\]" | ForEach-Object { $_.Matches.Groups[1].Value }
+                 $behind = git status -sb 2>$null | Select-String "\[behind (\d+)\]" | ForEach-Object { $_.Matches.Groups[1].Value }
+
+                 $stashCount = (git stash list | Measure-Object -Line).Lines
+                 $untracked = (git ls-files --others --exclude-standard | Measure-Object -Line).Lines
+
+                 $gitInfo = " $branch"
+                 if ($status) { $gitInfo += " ●" }
+                 if ($ahead) { $gitInfo += " ↑$ahead" }
+                 if ($behind) { $gitInfo += " ↓$behind" }
+                 if ($stashCount -gt 0) { $gitInfo += " 📦$stashCount" }
+                 if ($untracked -gt 0) { $gitInfo += " ?$untracked" }
+
+                 return $gitInfo
+             }
+         }
+         catch {
+             return $null
+         }
+
+         return $null
+     }
+     
+
+    # Python Virtual Environment Detection
+    function Get-VirtualEnvInfo {
+        if ($env:VIRTUAL_ENV) {
+            return " 🐍 $(Split-Path $env:VIRTUAL_ENV -Leaf)"
+        }
+        return $null
+    }
+
+    # Command Execution Time
+    $LastCommand = Get-History -Count 1
+    if ($lastCommand) {
+        $RunTime = ($lastCommand.EndExecutionTime - $lastCommand.StartExecutionTime).TotalSeconds 
+    }
+    if ($RunTime -ge 60) {
+        $ts = [timespan]::fromseconds($RunTime)
+        $min, $sec = ($ts.ToString("mm\:ss")).Split(":")
+        $ElapsedTime = -join ($min, " min ", $sec, " sec")
+    }
+    else {
+        $ElapsedTime = [math]::Round(($RunTime), 2)
+        $ElapsedTime = -join (($ElapsedTime.ToString()), " sec")
+    }
+
+    # Display Prompt
+    Write-Host ""
+    
+    # Admin Status
+    if ($IsAdmin) {
+        Write-Host " 👑 Admin " -BackgroundColor $colors.AdminBg -ForegroundColor $colors.AdminFg -NoNewline
+    }
+
+    # User and Path
+    Write-Host " 👤 $($CmdPromptUser.Name.split("\")[1]) " -BackgroundColor $colors.UserBg -ForegroundColor $colors.UserFg -NoNewline
+    
+    # Path with different style for drives
+    If ($CmdPromptCurrentFolder -like "*:*") {
+        Write-Host " 📂 $CmdPromptCurrentFolder " -ForegroundColor $colors.PathFg -BackgroundColor $colors.PathBg -NoNewline
+    }
+    else {
+        Write-Host " 📂 .\$CmdPromptCurrentFolder\ " -ForegroundColor $colors.PathFg -BackgroundColor $colors.PathBg -NoNewline
+    }
+
+    # Battery Status
+    # $batteryStatus = Get-BatteryStatus
+    # if ($batteryStatus) {
+    #     Write-Host " $batteryStatus " -ForegroundColor $colors.BatteryFg -BackgroundColor $colors.BatteryBg -NoNewline
+    # }
+
+    # Git Status
+    $gitStatus = Get-GitStatus
+    if ($gitStatus) {
+        Write-Host " $gitStatus " -ForegroundColor $colors.GitFg -BackgroundColor $colors.GitBg -NoNewline
+    }
+
+    # Python Virtual Environment
+    $venvInfo = Get-VirtualEnvInfo
+    if ($venvInfo) {
+        Write-Host $venvInfo -ForegroundColor $colors.PythonFg -BackgroundColor $colors.PythonBg -NoNewline
+    }
+
+    # Time and Execution Duration
+    # Write-Host " $date " -ForegroundColor $colors.TimeFg -BackgroundColor $colors.TimeBg -NoNewLine
+    Write-Host " ⌚️$elapsedTime " -ForegroundColor $colors.ExecutionFg -BackgroundColor $colors.ExecutionBg 
+
+    # return "λ "
+    return " 🤖  "
+}
+
+# Module Imports
+Import-Module PSFzf
+Import-Module Terminal-Icons
+
 # copy /b pic.jpg+tel.zip pix.jpg
 
+function anonsurf {
+    # Change to the specified directory
+    Set-Location "D:\Dev\python\AnonSurf"
+    & "D:\Dev\python\AnonSurf\env\Scripts\python.exe" "D:\Dev\python\AnonSurf\AnonSurf.py" start
+    # Start-Process -FilePath "D:\Dev\python\AnonSurf\env\Scripts\python.exe" -ArgumentList "D:\Dev\python\AnonSurf\AnonSurf.py start" -NoNewWindow -Wait
+}
 
 function winutil {
     irm "https://christitus.com/win" | iex
 }
 ${function:~} = { Set-Location ~ }
 ${function:v2} = {
-    Set-Location "C:\Users\baniminator\Desktop";
+    Set-Location "C:\Users\amirhosseindotzip\Desktop";
     # wget https://raw.githubusercontent.com/mahdibland/V2RayAggregator/master/Eternity.txt
     wget https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt
 }
@@ -177,30 +334,30 @@ Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory
 function ShowWifiPasswords { (netsh wlan show profiles) | Select-String "\:(.+)$" | % { $name = $_.Matches.Groups[1].Value.Trim(); $_ } | % { (netsh wlan show profile name="$name" key=clear) }  | Select-String "Key Content\W+\:(.+)$" | % { $pass = $_.Matches.Groups[1].Value.Trim(); $_ } | % { [PSCustomObject]@{ PROFILE_NAME = $name; PASSWORD = $pass } } | Format-Table -AutoSize }
 function perplexity { powershell D:\Programs\vivaldi\Application\vivaldi.exe --app=https://www.perplexity.ai; exit; }
 function p8 { ping 8.8.8.8 -t }
-function bat { param($a) & "C:\Users\baniminator\scoop\apps\bat\0.24.0\bat.exe" $a }
+function bat { param($a) & "C:\Users\amirhosseindotzip\scoop\apps\bat\0.24.0\bat.exe" $a }
 function whenexpire { slmgr /xpr }
 function getName { wmic "csproduct get name" }
 # function schrome { chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security }
 # function cc { & "C:\Program Files\Mozilla Firefox\firefox.exe" -private-window 'https://chatbot.theb.ai'; exit }
 function fcs    { curl "https://wttr.in/tonekabon" }
 function fcs2 { curl "https://v2.wttr.in/tonekabon" }
-function des { Set-Location "C:\Users\baniminator\Desktop\" }
+function des { Set-Location "C:\Users\amirhosseindotzip\Desktop\" }
 function which($command) { Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue }
 function psconf {
-    Set-Location C:\Users\baniminator\.config\powershell;
-    astronvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" 
+    Set-Location C:\Users\amirhosseindotzip\.config\powershell;
+    astronvim "C:\Users\amirhosseindotzip\.config\powershell\user_profile.ps1" 
 }
 function psv {
-    Set-Location C:\Users\baniminator\.config\powershell;
-    nvim "C:\Users\baniminator\.config\powershell\user_profile.ps1" 
+    Set-Location C:\Users\amirhosseindotzip\.config\powershell;
+    nvim "C:\Users\amirhosseindotzip\.config\powershell\user_profile.ps1" 
 }
-function psfold { Set-Location "C:\Users\baniminator\.config\powershell" }
-# function nvconf { nvim "C:\Users\baniminator\AppData\Local\nvim\init.lua" }
-# function nvfold { Set-Location C:\Users\baniminator\AppData\Local\nvim }
+function psfold { Set-Location "C:\Users\amirhosseindotzip\.config\powershell" }
+# function nvconf { nvim "C:\Users\amirhosseindotzip\AppData\Local\nvim\init.lua" }
+# function nvfold { Set-Location C:\Users\amirhosseindotzip\AppData\Local\nvim }
 # function nxfold { Set-Location D:\sourceerror\Web\frontend\._NEXT\ }
-function hist { v "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
-function histv { nvim "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
-function histc { c "C:\Users\baniminator\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
+function hist { v "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
+function histv { nvim "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
+function histc { c "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" }
 # {yt-dlp -x --audio-format mp3 --output '%(playlist_index)s-%(title)s.%(ext)s' $link
 function yymp3 ($link) { yt-dlp -x --audio-format mp3 --output '%(title)s.%(ext)s' $link }
 
@@ -343,144 +500,9 @@ Function mm { mpv --vo=null --video=no --no-video --term-osd-bar --no-resume-pla
 function cm { Set-Location D:\Music }
 function d { Set-Location "D:\" }
 function ShowWifiPasswords { (netsh wlan show profiles) | Select-String "\:(.+)$" | % { $name = $_.Matches.Groups[1].Value.Trim(); $_ } | % { (netsh wlan show profile name="$name" key=clear) }  | Select-String "Key Content\W+\:(.+)$" | % { $pass = $_.Matches.Groups[1].Value.Trim(); $_ } | % { [PSCustomObject]@{ PROFILE_NAME = $name; PASSWORD = $pass } } | Format-Table -AutoSize }
-function installer { irm "https://christitus.com/win" | iex }
 
 
-function prompt {
-    # Environment Setup
-    $host.ui.RawUI.WindowTitle = "$pwd"
-    $CmdPromptCurrentFolder = Split-Path -Path $pwd -Leaf
-    $CmdPromptUser = [Security.Principal.WindowsIdentity]::GetCurrent();
-    $Date = Get-Date -Format 'dddd hh:mm:ss tt'
-    $IsAdmin = (New-Object Security.Principal.WindowsPrincipal ([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
 
-    # Color Theme
-    $colors = @{
-        AdminBg     = "DarkRed"
-        AdminFg     = "White"
-        UserBg      = "DarkBlue"
-        UserFg      = "White"
-        PathBg      = "DarkGray"
-        PathFg      = "White"
-        GitBg       = "Blue"           # Changed from DarkMagenta to Blue
-        GitFg       = "White"
-        TimeBg      = "DarkCyan"
-        TimeFg      = "White"
-        BatteryBg   = "Green"      # Changed from DarkYellow to Green
-        BatteryFg   = "Black"      # Changed to Black for better contrast on Green
-        PythonBg    = "DarkGreen"
-        PythonFg    = "White"
-        ExecutionBg = "DarkGray"
-        ExecutionFg = "White"
-    }
-
-    function Get-BatteryStatus {
-        $battery = Get-CimInstance Win32_Battery
-        if ($battery) {
-            $percentage = $battery.EstimatedChargeRemaining
-            $status = if ($battery.BatteryStatus -eq 2) { "⚡" } else { "🔋" }
-            return "$status$percentage%"
-        }
-        return $null
-    }
-
-    # Git Status Function with Extended Information
-    function Get-GitStatus {
-        if (Get-Command git -ErrorAction SilentlyContinue) {
-            try {
-                $branch = git rev-parse --abbrev-ref HEAD 2>$null
-                if ($branch) {
-                    $status = git status --porcelain
-                    $ahead = git status -sb 2>$null | Select-String "\[ahead (\d+)\]" | ForEach-Object { $_.Matches.Groups[1].Value }
-                    $behind = git status -sb 2>$null | Select-String "\[behind (\d+)\]" | ForEach-Object { $_.Matches.Groups[1].Value }
-                    
-                    $stashCount = (git stash list | Measure-Object -Line).Lines
-                    $untracked = (git ls-files --others --exclude-standard | Measure-Object -Line).Lines
-                    
-                    $gitInfo = " $branch"
-                    if ($status) { $gitInfo += " ●" }
-                    if ($ahead) { $gitInfo += " ↑$ahead" }
-                    if ($behind) { $gitInfo += " ↓$behind" }
-                    if ($stashCount -gt 0) { $gitInfo += " 📦$stashCount" }
-                    if ($untracked -gt 0) { $gitInfo += " ?$untracked" }
-                    
-                    return $gitInfo
-                }
-            }
-            catch {
-                return $null
-            }
-        }
-        return $null
-    }
-
-    # Python Virtual Environment Detection
-    function Get-VirtualEnvInfo {
-        if ($env:VIRTUAL_ENV) {
-            return " 🐍 $(Split-Path $env:VIRTUAL_ENV -Leaf)"
-        }
-        return $null
-    }
-
-    # Command Execution Time
-    $LastCommand = Get-History -Count 1
-    if ($lastCommand) {
-        $RunTime = ($lastCommand.EndExecutionTime - $lastCommand.StartExecutionTime).TotalSeconds 
-    }
-    if ($RunTime -ge 60) {
-        $ts = [timespan]::fromseconds($RunTime)
-        $min, $sec = ($ts.ToString("mm\:ss")).Split(":")
-        $ElapsedTime = -join ($min, " min ", $sec, " sec")
-    }
-    else {
-        $ElapsedTime = [math]::Round(($RunTime), 2)
-        $ElapsedTime = -join (($ElapsedTime.ToString()), " sec")
-    }
-
-    # Display Prompt
-    Write-Host ""
-    
-    # Admin Status
-    if ($IsAdmin) {
-        Write-Host " 👑 Admin " -BackgroundColor $colors.AdminBg -ForegroundColor $colors.AdminFg -NoNewline
-    }
-
-    # User and Path
-    Write-Host " 👤 $($CmdPromptUser.Name.split("\")[1]) " -BackgroundColor $colors.UserBg -ForegroundColor $colors.UserFg -NoNewline
-    
-    # Path with different style for drives
-    If ($CmdPromptCurrentFolder -like "*:*") {
-        Write-Host " 📂 $CmdPromptCurrentFolder " -ForegroundColor $colors.PathFg -BackgroundColor $colors.PathBg -NoNewline
-    }
-    else {
-        Write-Host " 📂 .\$CmdPromptCurrentFolder\ " -ForegroundColor $colors.PathFg -BackgroundColor $colors.PathBg -NoNewline
-    }
-
-    # Battery Status
-    $batteryStatus = Get-BatteryStatus
-    if ($batteryStatus) {
-        Write-Host " $batteryStatus " -ForegroundColor $colors.BatteryFg -BackgroundColor $colors.BatteryBg -NoNewline
-    }
-
-    # Git Status
-    $gitStatus = Get-GitStatus
-    if ($gitStatus) {
-        Write-Host " $gitStatus " -ForegroundColor $colors.GitFg -BackgroundColor $colors.GitBg -NoNewline
-    }
-
-    # Python Virtual Environment
-    $venvInfo = Get-VirtualEnvInfo
-    if ($venvInfo) {
-        Write-Host $venvInfo -ForegroundColor $colors.PythonFg -BackgroundColor $colors.PythonBg -NoNewline
-    }
-
-    # Time and Execution Duration
-    Write-Host " $date " -ForegroundColor $colors.TimeFg -BackgroundColor $colors.TimeBg -NoNewLine
-    Write-Host " ⌚️$elapsedTime " -ForegroundColor $colors.ExecutionFg -BackgroundColor $colors.ExecutionBg 
-
-    # return "λ "
-    return " 🤖  "
-}
 
 
 
@@ -904,7 +926,6 @@ function Select-YTDPLOptions {
 
 
 # mpv videoName -sub-file sub1 -sub-file sub2 -secondary-sid 2
-
 function ff {
     param(
         [string]$searchTerm
@@ -917,5 +938,5 @@ function ff {
 
 # digitalClock
 # Invoke-Expression (&starship init powershell)
-(ptr completion) -join "`n" | iex
+# (ptr completion) -join "`n" | iex
 Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
