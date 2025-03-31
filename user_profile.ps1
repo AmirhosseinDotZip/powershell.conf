@@ -46,6 +46,18 @@ Import-Module Terminal-Icons
 
 function asdf {ping asdf.com}
 
+function ip {
+    $output = ipconfig | Select-String -Context 0,20 -Pattern "Ethernet adapter Ethernet:|Wireless LAN adapter Wi-Fi:"
+    foreach ($match in $output) {
+        Write-Host "`n$($match.Line)" -ForegroundColor Green
+        $match.Context.PostContext | 
+            Where-Object { $_ -match 'IPv4 Address' } | 
+            Select-Object -First 1 |
+            ForEach-Object { Write-Host $_.Trim() }
+    }
+    Write-Host ""
+}
+
 function anonsurf
 {
   # Change to the specified directory
@@ -90,8 +102,58 @@ Function rx
   exit
 }
 
-Function CountPyLines {
-  Get-ChildItem -Recurse -File -Filter "*.py" | ForEach-Object { (Get-Content $_.FullName).Count } | Measure-Object -Sum | Select-Object -ExpandProperty Sum
+Function PyLines {
+  python "D:\Dev\python\PyLineCounter\main.py" $args
+}
+
+Function CountLines {
+    param (
+        [Parameter(Mandatory = $true)]
+        [string]$x,
+        [switch]$t
+    )
+    
+    # Get all matching files
+    $files = Get-ChildItem -Recurse -File -Filter "*.$x"
+    
+    if (-not $files) {
+        Write-Host "`nNo *.$x files found in the current directory and its subdirectories.`n" -ForegroundColor Yellow
+        return
+    }
+    
+    # Count total lines
+    $fileResults = $files | ForEach-Object { 
+        $lines = (Get-Content $_.FullName -ErrorAction SilentlyContinue).Count
+        if ($t) {
+            [PSCustomObject]@{
+                Path = $_.FullName
+                Lines = if ($null -eq $lines) { 0 } else { $lines }
+            }
+        } else {
+            if ($null -eq $lines) { 0 } else { $lines }
+        }
+    }
+
+    if ($t) {
+        # Display tree structure with line counts
+        Write-Host "`nFile structure for *.$x files:`n" -ForegroundColor Cyan
+        $currentPath = (Get-Location).Path
+        $fileResults | ForEach-Object {
+            $relativePath = $_.Path.Substring($currentPath.Length + 1)
+            $indent = "  " * ($relativePath.Split([IO.Path]::DirectorySeparatorChar).Count - 1)
+            Write-Host "$indent├── $($relativePath.Split([IO.Path]::DirectorySeparatorChar)[-1])" -NoNewline
+            Write-Host " ($($_.Lines) lines)" -ForegroundColor Yellow
+        }
+        $totalLines = ($fileResults | Measure-Object -Property Lines -Sum).Sum
+    } else {
+        $totalLines = ($fileResults | Measure-Object -Sum).Sum
+    }
+
+    Write-Host "`nTotal lines in all .$x files: " -NoNewline
+    Write-Host $totalLines -ForegroundColor Green
+    Write-Host "Total files: " -NoNewline
+    Write-Host $files.Count -ForegroundColor Green
+    Write-Host ""
 }
 
 Function setprox
