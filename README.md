@@ -47,10 +47,10 @@ Contributions, suggestions, and improvements are always welcome! If you have any
 This Powershell configuration is licensed under the BANIMINATOR license. Please refer to the LICENSE file for more details.
 
 ### 📧 Contact <br/>
-If you have any questions or need further assistance, feel free to reach out to me at my[ Email](ambio.work@gmail.com), [Telegram](https://t.me/amirhossein_ix) or [Instagram](https://hid.den)
+If you have any questions or need further assistance, feel free to reach out to me at my[ Email](amirhosseindotzip@gmail.com), [Telegram](https://t.me/amirhosseindotzip) or [Instagram](https://hid.den)
 
 ### 🌐 Website <br/>
-Visit [your website](https://not.yet) for more information and other projects.
+Visit [me](https://amirhosseindotzip.t.me) for more information and other projects.
 
 ---
 ####  🌟 Thank you for checking out my Powershell configuration! Happy coding! 🌟
