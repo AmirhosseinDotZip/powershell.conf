@@ -7,18 +7,20 @@ This repository contains my personal Powershell configuration. It is designed to
 ### 🔧 How to Use
 1. Clone the repository:
    ```
-   git clone https://github.com/amirhossein-ix/powershell.conf
+   git clone https://github.com/amirhosseindotzip/powershell.conf
    ```
 
 2. Navigate where your config is placed by running this in your terminal:
    ```
    $PROFILE
    ```
+2.1. You will find Microsoft.PowerShell_profile.ps1 in there, 
+2.2. Put `. $env:USERPROFILE\.config\powershell\user_profile.ps1` which is the path to where you will put my powershell config(`powershell.conf`) in the first line of that file so it sources it
+2.3. for example my config is here `$HOME\.config\powershell`
+1. Customize the configuration to suit your needs. Update aliases, functions, and prompts based on your preferences and requirements.
 
-3. Put my config there, Customize the configuration to suit your needs. Update aliases, functions, and prompts based on your preferences and requirements.
 
-
-4. Reload your Powershell session.
+4. Reload your Powershell session with `.$PROFILE`.
 
 5. Enjoy!
    ```
