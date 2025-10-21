@@ -1,36 +1,46 @@
-# . "C:\Users\amirhosseindotzip\.config\powershell\mpv-powershell-completion.ps1"
-# Set-Alias c "C:\Users\amirhosseindotzip\AppData\Local\Programs\Microsoft VS Code\Code.exe"
-Set-Alias grep "C:\Program Files\Git\usr\bin\grep.exe"
+# $startTime = Get-Date
+# . "$HOME\.config\powershell\mpv-powershell-completion.ps1"
+# Set-Alias c "$HOME\AppData\Local\Programs\Microsoft VS Code\Code.exe"
+# Set-Alias grep "C:\Program Files\Git\usr\bin\grep.exe"
 # Set-Alias awk "C:\Program Files\Git\usr\bin\awk.exe"
 # Set-Alias tig "C:\Program Files\Git\usr\bin\tig.exe"
 # Set-Alias less "C:\Program Files\Git\usr\bin\less.exe"
-Set-Alias mkdir "C:\Program Files\Git\usr\bin\mkdir.exe"
+# Set-Alias mkdir "C:\Program Files\Git\usr\bin\mkdir.exe"
 Set-Alias touch "C:\Program Files\Git\usr\bin\touch.exe"
 # Set-Alias find "C:\Program Files\Git\usr\bin\find.exe"
-Set-Alias mv "C:\Program Files\Git\usr\bin\mv.exe"
-Set-Alias tail "C:\Program Files\Git\usr\bin\tail.exe"
-Set-Alias cmatrix "C:\Users\amirhosseindotzip\.config\powershell\cmatrix.ps1"
-Set-Alias pr "C:\Users\amirhosseindotzip\.config\powershell\pr.ps1"
-# Set-Alias digitalClock "C:\Users\amirhosseindotzip\.config\powershell\clock.ps1"
+# Set-Alias mv "C:\Program Files\/Git\usr\bin\mv.exe"
+# Set-Alias tail "C:\Program Files\Git\usr\bin\tail.exe"
+# Set-Alias cmatrix "$HOME\.config\powershell\cmatrix.ps1"
+Set-Alias pr "$HOME\.config\powershell\pr.ps1"
+# Set-Alias digitalClock "$HOME\.config\powershell\clock.ps1"
 
+
+Import-Module PSFzf
 Set-PsFzfOption -PSReadlineChordProvider 'Ctrl+f' -PSReadlineChordReverseHistory 'Ctrl+r'
+
+function cc {
+	cd "$HOME\AppData\Local\Programs\Microsoft VS Code"
+	.\Code.exe $arg
+}
+
 
 
 # Set-Alias -Name cd -Value z -Option AllScope
-# The Main Prompt
+# Cache admin status
+$script:IsAdmin = ([Security.Principal.WindowsPrincipal]([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
+
+# Optimized prompt function
 function prompt {
     $CmdPromptCurrentFolder = Split-Path -Path $pwd -Leaf
-    $IsAdmin = ([Security.Principal.WindowsPrincipal]([Security.Principal.WindowsIdentity]::GetCurrent())).IsInRole([Security.Principal.WindowsBuiltinRole]::Administrator)
     $pathDisplay = " 📂 $pwd "
-    $LastCommand = Get-History -Count 1
-    if ($LastCommand) {
-        $RunTime = [math]::Round(($LastCommand.EndExecutionTime - $LastCommand.StartExecutionTime).TotalSeconds)
-        $ElapsedTime = "$RunTime s"
-    }
-    else {
-        $ElapsedTime = "0 sec"
-    }
-    if ($IsAdmin) {
+    
+    # Use faster way to get last command duration
+    $lastCmd = Get-History -Count 1
+    $ElapsedTime = if ($lastCmd) {
+        "$([math]::Round(($lastCmd.EndExecutionTime - $lastCmd.StartExecutionTime).TotalSeconds)) s"
+    } else { "0 sec" }
+    
+    if ($script:IsAdmin) {
         Write-Host " 👑 " -BackgroundColor DarkRed -ForegroundColor White -NoNewline
     }
     Write-Host " 👤 $env:USERNAME " -BackgroundColor DarkBlue -ForegroundColor White -NoNewline
@@ -40,51 +50,53 @@ function prompt {
 }
 
 # Module Imports
-Import-Module PSFzf
 Import-Module Terminal-Icons
 # copy /b pic.jpg+tel.zip pix.jpg
 
 function asdf {ping asdf.com}
 
-function ip {
-    $output = ipconfig | Select-String -Context 0,20 -Pattern "Ethernet adapter Ethernet:|Wireless LAN adapter Wi-Fi:"
-    foreach ($match in $output) {
-        Write-Host "`n$($match.Line)" -ForegroundColor Green
-        $match.Context.PostContext | 
-            Where-Object { $_ -match 'IPv4 Address' } | 
-            Select-Object -First 1 |
-            ForEach-Object { Write-Host $_.Trim() }
-    }
-    Write-Host ""
+function PauseLogger {
+  set-location "D:\Dev\python\PauseLogger"
+  python "pause_logger.pyw"
 }
-
+set-alias pl PauseLogger
 function anonsurf
 {
-  # Change to the specified directory
   Set-Location "D:\Dev\python\AnonSurf"
   & "D:\Dev\python\AnonSurf\env\Scripts\python.exe" "D:\Dev\python\AnonSurf\AnonSurf.py" start
   # Start-Process -FilePath "D:\Dev\python\AnonSurf\env\Scripts\python.exe" -ArgumentList "D:\Dev\python\AnonSurf\AnonSurf.py start" -NoNewWindow -Wait
 }
-function ariaDown($url)
-{
-  # set-location "C:\Users\amirhosseindotzip\Downloads"
-  aria2c -x 16 -s 16 $url
-}
+
 
 function winutil
 {
   Invoke-RestMethod "https://christitus.com/win" | Invoke-Expression
 }
-${function:~} = { Set-Location ~ }
 
-${function:v2ray} = {
-  set-location "C:\Users\amirhosseindotzip\Desktop"
+function ~ { Set-Location ~ }
+
+function v2ray  {
+  set-location "$HOME\Desktop"
   $urls = @(
-    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vmess_iran.txt",
-    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
-    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/trojan_iran.txt",
-    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt",
-    "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt"
+    # "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vmess_iran.txt",
+    # "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/ss_iran.txt",
+    # "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/trojan_iran.txt",
+    # "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/vless_iran.txt",
+    # "https://raw.githubusercontent.com/youfoundamin/V2rayCollector/main/mixed_iran.txt",
+    # 
+    # 
+    # 
+    # "https://github.com/ircfspace/tvc/raw/main/sub/mix",
+    # "https://raw.githubusercontent.com/ircfspace/tvc/main/sub/vless",
+    # 
+    # "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/vmess.txt",
+    # "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/vless.txt",
+    # "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/mix.txt",
+    # "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/ss.txt",
+    # "https://raw.githubusercontent.com/Kwinshadow/TelegramV2rayCollector/main/sublinks/trojan.txt"
+    # 
+    # 
+    # 
   )
   foreach ($url in $urls)
   {
@@ -94,66 +106,22 @@ ${function:v2ray} = {
   }
 }
 
+# Function to run the AudioSpeedEdit Python script
+function AudioSpeedEdit {
+    python "D:\Dev\python\AudioSpeedEdit\AudioSpeedEdit.py" $args
+}
+
+function YTD {
+  python "D:\Dev\python\YTD\ytd.py" $args
+}
+
+
 # restart the windows explorer
 Function rx
 {
   taskkill /im explorer.exe /f
   Start-Process explorer.exe
   exit
-}
-
-Function PyLines {
-  python "D:\Dev\python\PyLineCounter\main.py" $args
-}
-
-Function CountLines {
-    param (
-        [Parameter(Mandatory = $true)]
-        [string]$x,
-        [switch]$t
-    )
-    
-    # Get all matching files
-    $files = Get-ChildItem -Recurse -File -Filter "*.$x"
-    
-    if (-not $files) {
-        Write-Host "`nNo *.$x files found in the current directory and its subdirectories.`n" -ForegroundColor Yellow
-        return
-    }
-    
-    # Count total lines
-    $fileResults = $files | ForEach-Object { 
-        $lines = (Get-Content $_.FullName -ErrorAction SilentlyContinue).Count
-        if ($t) {
-            [PSCustomObject]@{
-                Path = $_.FullName
-                Lines = if ($null -eq $lines) { 0 } else { $lines }
-            }
-        } else {
-            if ($null -eq $lines) { 0 } else { $lines }
-        }
-    }
-
-    if ($t) {
-        # Display tree structure with line counts
-        Write-Host "`nFile structure for *.$x files:`n" -ForegroundColor Cyan
-        $currentPath = (Get-Location).Path
-        $fileResults | ForEach-Object {
-            $relativePath = $_.Path.Substring($currentPath.Length + 1)
-            $indent = "  " * ($relativePath.Split([IO.Path]::DirectorySeparatorChar).Count - 1)
-            Write-Host "$indent├── $($relativePath.Split([IO.Path]::DirectorySeparatorChar)[-1])" -NoNewline
-            Write-Host " ($($_.Lines) lines)" -ForegroundColor Yellow
-        }
-        $totalLines = ($fileResults | Measure-Object -Property Lines -Sum).Sum
-    } else {
-        $totalLines = ($fileResults | Measure-Object -Sum).Sum
-    }
-
-    Write-Host "`nTotal lines in all .$x files: " -NoNewline
-    Write-Host $totalLines -ForegroundColor Green
-    Write-Host "Total files: " -NoNewline
-    Write-Host $files.Count -ForegroundColor Green
-    Write-Host ""
 }
 
 Function setprox
@@ -225,16 +193,11 @@ function p8
 { ping 8.8.8.8 -t 
 }
 function bat
-{ param($a) & "C:\Users\amirhosseindotzip\scoop\apps\bat\0.24.0\bat.exe" $a 
+{ param($a) & "$HOME\scoop\apps\bat\0.24.0\bat.exe" $a 
 }
 function whenexpire
 { slmgr /xpr 
 }
-function getName
-{ wmic "csproduct get name" 
-}
-# function schrome { chrome.exe --user-data-dir="C:/Chrome dev session" --disable-web-security }
-# function cc { & "C:\Program Files\Mozilla Firefox\firefox.exe" -private-window 'https://chatbot.theb.ai'; exit }
 function fcs
 { curl "https://wttr.in/tonekabon" 
 }
@@ -242,35 +205,35 @@ function fcs2
 { curl "https://v2.wttr.in/tonekabon" 
 }
 function des
-{ Set-Location "C:\Users\amirhosseindotzip\Desktop\" 
+{ Set-Location "$HOME\Desktop\" 
 }
 function which($command)
 { Get-Command -Name $command -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Path -ErrorAction SilentlyContinue 
 }
 function psconf
 {
-  Set-Location C:\Users\amirhosseindotzip\.config\powershell;
-  nvim "C:\Users\amirhosseindotzip\.config\powershell\user_profile.ps1" 
+  Set-Location $HOME\.config\powershell;
+  nvim "$HOME\.config\powershell\user_profile.ps1" 
 }
 function psv
 {
-  Set-Location C:\Users\amirhosseindotzip\.config\powershell;
-  lazynvim "C:\Users\amirhosseindotzip\.config\powershell\user_profile.ps1" 
+  Set-Location $HOME\.config\powershell;
+  lazynvim "$HOME\.config\powershell\user_profile.ps1" 
 }
 function psfold
-{ Set-Location "C:\Users\amirhosseindotzip\.config\powershell" 
+{ Set-Location "$HOME\.config\powershell" 
 }
-# function nvconf { nvim "C:\Users\amirhosseindotzip\AppData\Local\nvim\init.lua" }
-# function nvfold { Set-Location C:\Users\amirhosseindotzip\AppData\Local\nvim }
+# function nvconf { nvim "$HOME\AppData\Local\nvim\init.lua" }
+# function nvfold { Set-Location $HOME\AppData\Local\nvim }
 # function nxfold { Set-Location D:\sourceerror\Web\frontend\._NEXT\ }
 function hist
-{ nvim "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
+{ nvim "$HOME\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
 }
 function histv
-{ lazynvim "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
+{ lazynvim "$HOME\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
 }
 function histc
-{ c "C:\Users\amirhosseindotzip\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
+{ c "$HOME\AppData\Roaming\Microsoft\Windows\PowerShell\PSReadLine\ConsoleHost_history.txt" 
 }
 # {yt-dlp -x --audio-format mp3 --output '%(playlist_index)s-%(title)s.%(ext)s' $link
 function yymp3 ($link)
@@ -393,13 +356,15 @@ function findkill
     Stop-Process -Id $selectedProcess
   }
 }
+
+# Optimized file search functions
 function fdir
 {
   param (
     [string]$Path = $PWD.Path
   )
 
-  $selectedPath = Get-ChildItem -LiteralPath $Path -Directory -Recurse | Select-Object -ExpandProperty FullName | fzf
+  $selectedPath = Get-ChildItem -LiteralPath $Path -Directory | Select-Object -ExpandProperty FullName | fzf
 
   if ($selectedPath)
   {
@@ -411,10 +376,10 @@ function ffile
 {
   param (
     [string]$Path = $PWD.Path,
-    [string]$Editor = "astronvim"
+    [string]$Editor = "lazynvim"
   )
 
-  $selectedFile = Get-ChildItem -LiteralPath $Path -File -Recurse | Select-Object -ExpandProperty FullName | fzf
+  $selectedFile = Get-ChildItem -LiteralPath $Path -File | Select-Object -ExpandProperty FullName | fzf
 
   if ($selectedFile)
   {
@@ -422,11 +387,9 @@ function ffile
   }
 }
 
-
-
-
-
 # digitalClock
 # Invoke-Expression (&starship init powershell)
 # (ptr completion) -join "`n" | iex
 Invoke-Expression (& { (zoxide init powershell --cmd cd | Out-String) })
+
+# Write-Host ("Profile loaded in: {0:0.00} seconds" -f ((Get-Date) - $startTime).TotalSeconds)
