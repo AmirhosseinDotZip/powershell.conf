@@ -14,15 +14,15 @@ This repository contains my personal Powershell configuration. It is designed to
    ```
    $PROFILE
    ```
-2.1. You will find Microsoft.PowerShell_profile.ps1 in there, 
-2.2. Put `. $env:USERPROFILE\.config\powershell\user_profile.ps1` which is the path to where you will put my powershell config(`powershell.conf`) in the first line of that file so it sources it
-2.3. for example my config is here `$HOME\.config\powershell`
-1. Customize the configuration to suit your needs. Update aliases, functions, and prompts based on your preferences and requirements.
+3. You will find Microsoft.PowerShell_profile.ps1 in there, 
+4. Put `. $env:USERPROFILE\.config\powershell\user_profile.ps1` which is the path to where you will put my powershell config(`powershell.conf`) in the first line of that file so it sources it
+5. for example my config is here `$HOME\.config\powershell`
+6. Customize the configuration to suit your needs. Update aliases, functions, and prompts based on your preferences and requirements.
 
 
-4. Reload your Powershell session with `.$PROFILE`.
+7. Reload your Powershell session with `.$PROFILE`.
 
-5. Enjoy!
+8. Enjoy!
    ```
    🚀🚀🚀 
    ```
